@@ -531,14 +531,6 @@ const SmokeBackground = () => {
             let dt = Math.min((now - lastTime) / 1000, 0.016);
             lastTime = now;
 
-            if (Math.random() < 0.05) {
-                splat(Math.random(), Math.random(), (Math.random() - 0.5) * 2000, (Math.random() - 0.5) * 2000, {
-                    r: Math.random() * 0.2,
-                    g: Math.random() * 0.2,
-                    b: Math.random() * 0.5
-                });
-            }
-
             step(dt);
 
             displayProgram.bind();
@@ -551,18 +543,47 @@ const SmokeBackground = () => {
 
         update();
 
-        const handleMove = (e: any) => {
-            const rect = canvas!.getBoundingClientRect();
-            let x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
-            let y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+        let isMouseDown = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
 
-            splat(x / canvas!.width, 1.0 - y / canvas!.height, (Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500, {
+        const handleDown = (e: any) => {
+            isMouseDown = true;
+            const rect = canvas!.getBoundingClientRect();
+            lastMouseX = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+            lastMouseY = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+            splat(lastMouseX / canvas!.width, 1.0 - lastMouseY / canvas!.height, (Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500, {
                 r: 0.1, g: 0.2, b: 0.8
             });
         };
 
+        const handleUp = () => {
+            isMouseDown = false;
+        };
+
+        const handleMove = (e: any) => {
+            if (!isMouseDown) return;
+            const rect = canvas!.getBoundingClientRect();
+            let x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+            let y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+            let dx = (x - lastMouseX) * 5.0;
+            let dy = (y - lastMouseY) * 5.0;
+
+            splat(x / canvas!.width, 1.0 - y / canvas!.height, dx, -dy, {
+                r: 0.1, g: 0.2, b: 0.8
+            });
+
+            lastMouseX = x;
+            lastMouseY = y;
+        };
+
+        window.addEventListener('mousedown', handleDown);
+        window.addEventListener('mouseup', handleUp);
         window.addEventListener('mousemove', handleMove);
-        window.addEventListener('touchstart', handleMove);
+        window.addEventListener('touchstart', handleDown);
+        window.addEventListener('touchend', handleUp);
         window.addEventListener('touchmove', handleMove);
 
         const handleResize = () => {
@@ -575,8 +596,11 @@ const SmokeBackground = () => {
 
         return () => {
             cancelAnimationFrame(animationFrameId);
+            window.removeEventListener('mousedown', handleDown);
+            window.removeEventListener('mouseup', handleUp);
             window.removeEventListener('mousemove', handleMove);
-            window.removeEventListener('touchstart', handleMove);
+            window.removeEventListener('touchstart', handleDown);
+            window.removeEventListener('touchend', handleUp);
             window.removeEventListener('touchmove', handleMove);
             window.removeEventListener('resize', handleResize);
         };
