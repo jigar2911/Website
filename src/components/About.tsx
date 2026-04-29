@@ -5,11 +5,13 @@ const About = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <div className="relative">
             <div className="aspect-square rounded-[3rem] bg-gradient-to-br from-brand-blue to-brand-orange opacity-20 absolute -inset-4 blur-2xl"></div>
-            <div className="relative aspect-square rounded-[3rem] bg-white/5 border border-white/10 flex items-center justify-center p-12 overflow-hidden">
-                <div className="text-[12rem] font-black text-white/5 select-none absolute">OCW</div>
-                <div className="text-center">
-                    <p className="text-8xl font-black text-brand-orange leading-none">100%</p>
-                    <p className="text-2xl font-bold text-white mt-2">New Zealand Owned</p>
+            <div className="relative aspect-square rounded-[3rem] bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                <img src="/photo2.png" alt="NZ Owned" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <div className="text-center">
+                        <p className="text-6xl font-black text-brand-orange leading-none">100%</p>
+                        <p className="text-xl font-bold text-white mt-2">New Zealand Owned</p>
+                    </div>
                 </div>
             </div>
           </div>

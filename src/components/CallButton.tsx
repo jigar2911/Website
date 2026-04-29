@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 const CallButton = () => {
   return (
     <motion.a
-      href="tel:+6400000000" // Placeholder NZ number
+      href="tel:+64277777728"
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       whileHover={{ scale: 1.1 }}

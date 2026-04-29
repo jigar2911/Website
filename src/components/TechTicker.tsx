@@ -3,9 +3,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const tech = [
-  "Next.js", "React", "TypeScript", "Tailwind CSS", "Node.js", "WebGL",
-  "E-commerce", "SEO Optimization", "NZ Hosting", "UI/UX Design",
-  "Google Analytics", "Digital Marketing", "App Development"
+  "#css", "#html", "#php", "#react", "#nextjs", "#webdesign", "#seo",
+  "#marketing", "#branding", "#ecommerce", "#saas", "#automation"
 ];
 
 const TechTicker = () => {

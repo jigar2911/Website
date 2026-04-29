@@ -171,8 +171,6 @@ const SmokeBackground = () => {
             varying vec2 vT;
             varying vec2 vB;
             uniform sampler2D uTexture;
-            uniform sampler2D uBloom;
-            uniform sampler2D uSunrays;
             uniform vec2 texelSize;
             void main () {
                 vec3 c = texture2D(uTexture, vUv).rgb;
@@ -188,12 +186,8 @@ const SmokeBackground = () => {
                     float diffuse = clamp(dot(n, l) + 0.7, 0.7, 1.0);
                     c *= diffuse;
                 #endif
-                #ifdef BLOOM
-                    vec3 bloom = texture2D(uBloom, vUv).rgb;
-                    c += bloom;
-                #endif
                 float a = max(c.r, max(c.g, c.b));
-                gl_FragColor = vec4(c, a);
+                gl_FragColor = vec4(c, a * 0.8);
             }
         `;
 
@@ -422,7 +416,7 @@ const SmokeBackground = () => {
         const pressureProgram = new Program(baseVertexShader, pressureShader);
         const gradienSubtractProgram = new Program(baseVertexShader, gradienSubtractShader);
 
-        let displayProgram = new Program(baseVertexShader, compileShader(gl.FRAGMENT_SHADER, displayShaderSource, ["SHADING", "BLOOM"]));
+        let displayProgram = new Program(baseVertexShader, compileShader(gl.FRAGMENT_SHADER, displayShaderSource, ["SHADING"]));
 
         let dye: any, velocity: any, divergence: any, curl: any, pressure: any;
 
@@ -534,6 +528,7 @@ const SmokeBackground = () => {
             blit(velocity.write);
             velocity.swap();
 
+            gl.uniform2f(advectionProgram.uniforms.texelSize, dye.texelSizeX, dye.texelSizeY);
             gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read.attach(0));
             gl.uniform1i(advectionProgram.uniforms.uSource, dye.read.attach(1));
             gl.uniform1f(advectionProgram.uniforms.dissipation, config.DENSITY_DISSIPATION);
@@ -648,7 +643,7 @@ const SmokeBackground = () => {
     return (
         <canvas
             ref={canvasRef}
-            className="fixed inset-0 w-full h-full -z-10"
+            className="fixed inset-0 w-full h-full -z-10 pointer-events-none"
             style={{ background: '#050a15' }}
         />
     );

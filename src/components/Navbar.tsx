@@ -6,9 +6,12 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex-shrink-0 flex items-center">
-            <span className="text-2xl font-bold text-white tracking-tighter">
-              ONCALL<span className="text-brand-orange">WEBSITES</span>
-            </span>
+            <Link href="/" className="flex items-center gap-2">
+              <img src="/logo.png" alt="Oncall Websites Logo" className="h-10 w-auto" />
+              <span className="text-2xl font-bold text-white tracking-tighter hidden sm:block">
+                ONCALL<span className="text-brand-orange">WEBSITES</span>
+              </span>
+            </Link>
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">

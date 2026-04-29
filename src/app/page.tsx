@@ -12,7 +12,7 @@ import CallButton from '@/components/CallButton';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black">
+    <main className="min-h-screen">
       <SmokeBackground />
       <Navbar />
       <Hero />
