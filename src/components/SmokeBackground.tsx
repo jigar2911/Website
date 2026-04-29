@@ -571,7 +571,7 @@ const SmokeBackground = () => {
             const s = 1.0;
             const v = 1.0;
 
-            let r, g, b, i, f, p, q, t;
+            let r = 0, g = 0, b = 0, i, f, p, q, t;
             i = Math.floor(h * 6);
             f = h * 6 - i;
             p = v * (1 - s);
