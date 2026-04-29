@@ -11,12 +11,12 @@ const SmokeBackground = () => {
         const config = {
             SIM_RESOLUTION: 128,
             DYE_RESOLUTION: 1024,
-            DENSITY_DISSIPATION: 1,
+            DENSITY_DISSIPATION: 0.2, // Much lower for persistence
             VELOCITY_DISSIPATION: 0.2,
             PRESSURE: 0.8,
             PRESSURE_ITERATIONS: 20,
-            CURL: 30,
-            SPLAT_RADIUS: 0.25,
+            CURL: 30, // Balanced swirls
+            SPLAT_RADIUS: 0.8, // Much larger, softer clouds
             SPLAT_FORCE: 6000,
             SHADING: true,
             COLORFUL: true,
@@ -537,12 +537,23 @@ const SmokeBackground = () => {
         }
 
         let lastTime = Date.now();
+        let lastSplatTime = 0;
         let animationFrameId: number;
 
         function update() {
             let now = Date.now();
             let dt = Math.min((now - lastTime) / 1000, 0.016);
             lastTime = now;
+
+            // Automatic splats to keep effect alive
+            if (now - lastSplatTime > 3000) {
+                for (let i = 0; i < 1; i++) {
+                    const color = generateRandomColor();
+                    // Slow moving ambient splats
+                    splat(Math.random(), Math.random(), (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100, color);
+                }
+                lastSplatTime = now;
+            }
 
             step(dt);
 
@@ -562,8 +573,9 @@ const SmokeBackground = () => {
         let currentColor = { r: 0.1, g: 0.2, b: 0.8 };
 
         function generateRandomColor() {
-            const h = Math.random();
-            const s = 1.0;
+            // Target purples, blues, and cyans as seen in the pics
+            const h = 0.5 + Math.random() * 0.3; // Range around blues/purples
+            const s = 0.8 + Math.random() * 0.2;
             const v = 1.0;
 
             let r = 0, g = 0, b = 0, i, f, p, q, t;
@@ -580,8 +592,8 @@ const SmokeBackground = () => {
                 case 4: r = t, g = p, b = v; break;
                 case 5: r = v, g = p, b = q; break;
             }
-            // Scale down for smokey effect intensity
-            return { r: r * 0.2, g: g * 0.2, b: b * 0.2 };
+            // High intensity for thick gaseous look
+            return { r: r, g: g, b: b };
         }
 
         const handleDown = (e: any) => {

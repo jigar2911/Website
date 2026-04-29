@@ -3,8 +3,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const tech = [
-  "#css", "#html", "#php", "#react", "#nextjs", "#webdesign", "#seo",
-  "#marketing", "#branding", "#ecommerce", "#saas", "#automation"
+  "#nodejs", "#wordpress", "#reactjs", "#nextjs", "#typescript",
+  "#tailwindcss", "#webdesign", "#seo", "#marketing", "#branding",
+  "#ecommerce", "#saas", "#automation", "#php", "#mysql", "#aws"
 ];
 
 const TechTicker = () => {
@@ -12,18 +13,15 @@ const TechTicker = () => {
     <div className="py-10 bg-brand-orange overflow-hidden whitespace-nowrap relative border-y-4 border-black">
       <motion.div
         className="inline-block"
-        animate={{ x: [0, -1000] }}
+        animate={{ x: ["0%", "-50%"] }}
         transition={{
-          x: {
-            repeat: Infinity,
-            repeatType: "loop",
-            duration: 20,
-            ease: "linear"
-          }
+          duration: 30,
+          ease: "linear",
+          repeat: Infinity,
         }}
       >
-        {[...tech, ...tech, ...tech].map((item, index) => (
-          <span key={index} className="text-3xl md:text-5xl font-black text-black mx-8 uppercase tracking-tighter italic">
+        {[...tech, ...tech].map((item, index) => (
+          <span key={index} className="text-3xl md:text-5xl font-black text-black mx-8 uppercase tracking-tighter italic inline-flex items-center">
             {item} <span className="text-white ml-8">•</span>
           </span>
         ))}
