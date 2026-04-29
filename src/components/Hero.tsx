@@ -1,8 +1,10 @@
 import { ArrowRight } from 'lucide-react';
+import FloatingShapes from './FloatingShapes';
 
 const Hero = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 px-4 overflow-hidden">
+      <FloatingShapes />
       <div className="max-w-7xl mx-auto text-center z-10">
         <div className="inline-flex items-center space-x-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full mb-8 backdrop-blur-sm">
           <span className="relative flex h-3 w-3">
@@ -18,8 +20,11 @@ const Hero = () => {
           WEBSITES
         </h1>
 
-        <p className="text-lg md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto font-medium">
-          Specializing in high-performance Web Apps, SEO, and Marketing solutions
+        <p className="text-lg md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto font-medium relative group">
+          Specializing in high-performance
+          <span className="text-white px-2 py-1 bg-white/5 border border-white/10 rounded-lg mx-1 inline-block hover:border-brand-orange/50 transition-colors">Web Apps</span>,
+          <span className="text-white px-2 py-1 bg-white/5 border border-white/10 rounded-lg mx-1 inline-block hover:border-brand-orange/50 transition-colors">SEO</span>, and
+          <span className="text-white px-2 py-1 bg-white/5 border border-white/10 rounded-lg mx-1 inline-block hover:border-brand-orange/50 transition-colors">Marketing</span> solutions
           that drive real growth for Kiwi businesses.
         </p>
 

@@ -426,6 +426,18 @@ const SmokeBackground = () => {
 
         let dye: any, velocity: any, divergence: any, curl: any, pressure: any;
 
+        function deleteFBO(fbo: any) {
+            if (!fbo) return;
+            gl.deleteTexture(fbo.texture);
+            gl.deleteFramebuffer(fbo.fbo);
+        }
+
+        function deleteDoubleFBO(fbo: any) {
+            if (!fbo) return;
+            deleteFBO(fbo.read);
+            deleteFBO(fbo.write);
+        }
+
         function initFramebuffers() {
             let simRes = config.SIM_RESOLUTION;
             let dyeRes = config.DYE_RESOLUTION;
@@ -436,6 +448,12 @@ const SmokeBackground = () => {
             let filtering = supportLinearFiltering ? gl.LINEAR : gl.NEAREST;
 
             gl.disable(gl.BLEND);
+
+            if (dye) deleteDoubleFBO(dye);
+            if (velocity) deleteDoubleFBO(velocity);
+            if (divergence) deleteFBO(divergence);
+            if (curl) deleteFBO(curl);
+            if (pressure) deleteDoubleFBO(pressure);
 
             dye = createDoubleFBO(dyeRes, dyeRes, rgba.internalFormat, rgba.format, texType, filtering);
             velocity = createDoubleFBO(simRes, simRes, rg.internalFormat, rg.format, texType, filtering);
@@ -546,16 +564,39 @@ const SmokeBackground = () => {
         let isMouseDown = false;
         let lastMouseX = 0;
         let lastMouseY = 0;
+        let currentColor = { r: 0.1, g: 0.2, b: 0.8 };
+
+        function generateRandomColor() {
+            const h = Math.random();
+            const s = 1.0;
+            const v = 1.0;
+
+            let r, g, b, i, f, p, q, t;
+            i = Math.floor(h * 6);
+            f = h * 6 - i;
+            p = v * (1 - s);
+            q = v * (1 - f * s);
+            t = v * (1 - (1 - f) * s);
+            switch (i % 6) {
+                case 0: r = v, g = t, b = p; break;
+                case 1: r = q, g = v, b = p; break;
+                case 2: r = p, g = v, b = t; break;
+                case 3: r = p, g = q, b = v; break;
+                case 4: r = t, g = p, b = v; break;
+                case 5: r = v, g = p, b = q; break;
+            }
+            // Scale down for smokey effect intensity
+            return { r: r * 0.2, g: g * 0.2, b: b * 0.2 };
+        }
 
         const handleDown = (e: any) => {
             isMouseDown = true;
+            currentColor = generateRandomColor();
             const rect = canvas!.getBoundingClientRect();
             lastMouseX = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
             lastMouseY = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
 
-            splat(lastMouseX / canvas!.width, 1.0 - lastMouseY / canvas!.height, (Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500, {
-                r: 0.1, g: 0.2, b: 0.8
-            });
+            splat(lastMouseX / canvas!.width, 1.0 - lastMouseY / canvas!.height, (Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500, currentColor);
         };
 
         const handleUp = () => {
@@ -571,9 +612,7 @@ const SmokeBackground = () => {
             let dx = (x - lastMouseX) * 5.0;
             let dy = (y - lastMouseY) * 5.0;
 
-            splat(x / canvas!.width, 1.0 - y / canvas!.height, dx, -dy, {
-                r: 0.1, g: 0.2, b: 0.8
-            });
+            splat(x / canvas!.width, 1.0 - y / canvas!.height, dx, -dy, currentColor);
 
             lastMouseX = x;
             lastMouseY = y;
