@@ -11,4 +11,8 @@
 body {
   color: white;
   background: #050a15;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
