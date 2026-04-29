@@ -11,18 +11,17 @@ const Hero = () => {
           <span className="text-white text-sm font-medium">Serving All of New Zealand</span>
         </div>
 
-        <h1 className="text-5xl md:text-8xl font-black text-white mb-8 tracking-tight leading-[0.9]">
-          PREMIER <br />
-          <span className="text-brand-orange">KIWI DIGITAL</span> <br />
-          SOLUTIONS
+        <h1 className="text-5xl md:text-9xl font-black text-white mb-8 tracking-tighter leading-[0.8] uppercase italic">
+          Premier <br />
+          <span className="text-brand-orange drop-shadow-[0_0_30px_rgba(255,140,0,0.3)]">Kiwi Digital</span> <br />
+          Solutions
         </h1>
 
-        <p className="text-lg md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto font-medium relative group">
+        <p className="text-lg md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto font-bold tracking-tight uppercase italic opacity-80">
           Specializing in high-performance
-          <span className="text-white px-2 py-1 bg-white/5 border border-white/10 rounded-lg mx-1 inline-block hover:border-brand-orange/50 transition-colors">Web Design</span>,
-          <span className="text-white px-2 py-1 bg-white/5 border border-white/10 rounded-lg mx-1 inline-block hover:border-brand-orange/50 transition-colors">NZ SEO</span>, and
-          <span className="text-white px-2 py-1 bg-white/5 border border-white/10 rounded-lg mx-1 inline-block hover:border-brand-orange/50 transition-colors">Support</span> solutions
-          tailored for local businesses from Auckland to Invercargill.
+          <span className="text-white mx-2 underline decoration-brand-orange decoration-4 underline-offset-8">Web Design</span>,
+          <span className="text-white mx-2 underline decoration-brand-orange decoration-4 underline-offset-8">NZ SEO</span>, and
+          <span className="text-white mx-2 underline decoration-brand-orange decoration-4 underline-offset-8">Support</span>
         </p>
 
         <div className="flex flex-col sm:flex-row justify-center items-center gap-6">

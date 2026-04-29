@@ -10,13 +10,13 @@ const SmokeBackground = () => {
 
         const config = {
             SIM_RESOLUTION: 128,
-            DYE_RESOLUTION: 1024,
-            DENSITY_DISSIPATION: 0.2, // Much lower for persistence
-            VELOCITY_DISSIPATION: 0.2,
+            DYE_RESOLUTION: 512,
+            DENSITY_DISSIPATION: 2.5, // Faster dissipation for more realistic "smoke trail"
+            VELOCITY_DISSIPATION: 1.0,
             PRESSURE: 0.8,
             PRESSURE_ITERATIONS: 20,
-            CURL: 30, // Balanced swirls
-            SPLAT_RADIUS: 0.8, // Much larger, softer clouds
+            CURL: 20, // Less curly, more trail-like
+            SPLAT_RADIUS: 0.15, // Tighter splat for cursor trail
             SPLAT_FORCE: 6000,
             SHADING: true,
             COLORFUL: true,
@@ -24,15 +24,8 @@ const SmokeBackground = () => {
             PAUSED: false,
             BACK_COLOR: { r: 5, g: 10, b: 21 },
             TRANSPARENT: false,
-            BLOOM: true,
-            BLOOM_ITERATIONS: 8,
-            BLOOM_RESOLUTION: 256,
-            BLOOM_INTENSITY: 0.8,
-            BLOOM_THRESHOLD: 0.6,
-            BLOOM_SOFT_KNEE: 0.7,
-            SUNRAYS: true,
-            SUNRAYS_RESOLUTION: 196,
-            SUNRAYS_WEIGHT: 1.0,
+            BLOOM: false,
+            SUNRAYS: false,
         };
 
         const glOptions = {
@@ -531,6 +524,7 @@ const SmokeBackground = () => {
             gl.uniform2f(advectionProgram.uniforms.texelSize, dye.texelSizeX, dye.texelSizeY);
             gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read.attach(0));
             gl.uniform1i(advectionProgram.uniforms.uSource, dye.read.attach(1));
+            gl.uniform1f(advectionProgram.uniforms.dt, dt);
             gl.uniform1f(advectionProgram.uniforms.dissipation, config.DENSITY_DISSIPATION);
             blit(dye.write);
             dye.swap();
@@ -540,18 +534,32 @@ const SmokeBackground = () => {
         let lastSplatTime = 0;
         let animationFrameId: number;
 
+        let frameCount = 0;
         function update() {
             let now = Date.now();
             let dt = Math.min((now - lastTime) / 1000, 0.016);
             lastTime = now;
 
+            // Stability check
+            if (dt <= 0) {
+                animationFrameId = requestAnimationFrame(update);
+                return;
+            }
+
+            frameCount++;
+            // Periodically clear pressure to prevent blowups
+            if (frameCount % 300 === 0) {
+                gl.viewport(0, 0, pressure.width, pressure.height);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, pressure.read.fbo);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, pressure.write.fbo);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+            }
+
             // Automatic splats to keep effect alive
             if (now - lastSplatTime > 3000) {
-                for (let i = 0; i < 1; i++) {
-                    const color = generateRandomColor();
-                    // Slow moving ambient splats
-                    splat(Math.random(), Math.random(), (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100, color);
-                }
+                const color = getNextColor();
+                splat(Math.random(), Math.random(), (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100, color);
                 lastSplatTime = now;
             }
 
@@ -567,15 +575,16 @@ const SmokeBackground = () => {
 
         update();
 
-        let isMouseDown = false;
         let lastMouseX = 0;
         let lastMouseY = 0;
-        let currentColor = { r: 0.1, g: 0.2, b: 0.8 };
+        let colorHue = Math.random();
+        let hasMoved = false;
 
-        function generateRandomColor() {
-            // Target purples, blues, and cyans as seen in the pics
-            const h = 0.5 + Math.random() * 0.3; // Range around blues/purples
-            const s = 0.8 + Math.random() * 0.2;
+        function getNextColor() {
+            colorHue += 0.005; // Smooth transition through spectrum
+            if (colorHue > 1) colorHue = 0;
+            const h = colorHue;
+            const s = 0.9;
             const v = 1.0;
 
             let r = 0, g = 0, b = 0, i, f, p, q, t;
@@ -592,45 +601,54 @@ const SmokeBackground = () => {
                 case 4: r = t, g = p, b = v; break;
                 case 5: r = v, g = p, b = q; break;
             }
-            // High intensity for thick gaseous look
-            return { r: r, g: g, b: b };
+            return { r, g, b };
         }
 
-        const handleDown = (e: any) => {
-            isMouseDown = true;
-            currentColor = generateRandomColor();
-            const rect = canvas!.getBoundingClientRect();
-            lastMouseX = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
-            lastMouseY = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
-
-            splat(lastMouseX / canvas!.width, 1.0 - lastMouseY / canvas!.height, (Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500, currentColor);
-        };
-
-        const handleUp = () => {
-            isMouseDown = false;
-        };
-
         const handleMove = (e: any) => {
-            if (!isMouseDown) return;
             const rect = canvas!.getBoundingClientRect();
-            let x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
-            let y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+            let x = (e.clientX || (e.touches && (e.touches[0].clientX || e.touches[0].pageX))) - rect.left;
+            let y = (e.clientY || (e.touches && (e.touches[0].clientY || e.touches[0].pageY))) - rect.top;
 
-            let dx = (x - lastMouseX) * 5.0;
-            let dy = (y - lastMouseY) * 5.0;
+            if (!hasMoved) {
+                lastMouseX = x;
+                lastMouseY = y;
+                hasMoved = true;
+                return;
+            }
 
-            splat(x / canvas!.width, 1.0 - y / canvas!.height, dx, -dy, currentColor);
+            let dx = (x - lastMouseX) * 10.0;
+            let dy = (y - lastMouseY) * 10.0;
+
+            // Generate multiple splats if moving fast to ensure a solid trail
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            const steps = Math.min(Math.max(Math.floor(dist / 20), 1), 10);
+
+            for(let i=0; i<steps; i++) {
+                const lerp = i / steps;
+                const currX = lastMouseX + (x - lastMouseX) * lerp;
+                const currY = lastMouseY + (y - lastMouseY) * lerp;
+                splat(currX / canvas!.width, 1.0 - currY / canvas!.height, dx / steps, -dy / steps, getNextColor());
+            }
 
             lastMouseX = x;
             lastMouseY = y;
         };
 
-        window.addEventListener('mousedown', handleDown);
-        window.addEventListener('mouseup', handleUp);
+        const handleClick = (e: any) => {
+            const rect = canvas!.getBoundingClientRect();
+            let x = (e.clientX || (e.touches && (e.touches[0].clientX || e.touches[0].pageX))) - rect.left;
+            let y = (e.clientY || (e.touches && (e.touches[0].clientY || e.touches[0].pageY))) - rect.top;
+
+            // Big burst on click
+            for(let i=0; i<8; i++) {
+                splat(x / canvas!.width, 1.0 - y / canvas!.height, (Math.random() - 0.5) * 2000, (Math.random() - 0.5) * 2000, getNextColor());
+            }
+        };
+
         window.addEventListener('mousemove', handleMove);
-        window.addEventListener('touchstart', handleDown);
-        window.addEventListener('touchend', handleUp);
         window.addEventListener('touchmove', handleMove);
+        window.addEventListener('mousedown', handleClick);
+        window.addEventListener('touchstart', handleClick);
 
         const handleResize = () => {
             canvas!.width = window.innerWidth;
@@ -642,12 +660,10 @@ const SmokeBackground = () => {
 
         return () => {
             cancelAnimationFrame(animationFrameId);
-            window.removeEventListener('mousedown', handleDown);
-            window.removeEventListener('mouseup', handleUp);
             window.removeEventListener('mousemove', handleMove);
-            window.removeEventListener('touchstart', handleDown);
-            window.removeEventListener('touchend', handleUp);
             window.removeEventListener('touchmove', handleMove);
+            window.removeEventListener('mousedown', handleClick);
+            window.removeEventListener('touchstart', handleClick);
             window.removeEventListener('resize', handleResize);
         };
     }, []);
