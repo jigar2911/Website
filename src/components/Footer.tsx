@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 const Footer = () => {
   return (
     <footer className="bg-black/80 backdrop-blur-xl text-white pt-16 pb-8 border-t border-white/10">
@@ -17,17 +19,17 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-bold mb-4 text-brand-orange">Quick Links</h3>
             <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Home</a></li>
-              <li><a href="#services" className="hover:text-white transition-colors">Services</a></li>
-              <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
+              <li><Link href="/" className="hover:text-white transition-colors">Home</Link></li>
+              <li><Link href="/#services" className="hover:text-white transition-colors">Services</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
             </ul>
           </div>
-          <div id="contact">
+          <div>
             <h3 className="text-lg font-bold mb-4 text-brand-orange">Get in Touch</h3>
             <ul className="space-y-2 text-gray-400">
               <li>Christchurch, New Zealand</li>
-              <li>sales@oncallsupport.co.nz</li>
-              <li>027 777 7728</li>
+              <li><a href="mailto:hello@oncallwebsites.co.nz" className="hover:text-white">hello@oncallwebsites.co.nz</a></li>
+              <li><a href="tel:+64277777728" className="hover:text-white">+64 27 777 7728</a></li>
             </ul>
           </div>
         </div>

@@ -15,10 +15,10 @@ const Navbar = () => {
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
-              <Link href="#" className="text-white hover:text-brand-orange px-3 py-2 transition-colors font-medium">Home</Link>
-              <Link href="#services" className="text-white hover:text-brand-orange px-3 py-2 transition-colors font-medium">Services</Link>
-              <Link href="#about" className="text-white hover:text-brand-orange px-3 py-2 transition-colors font-medium">About</Link>
-              <Link href="#contact" className="bg-brand-orange hover:bg-orange-600 text-white px-6 py-2 rounded-full transition-colors font-bold">Get Started</Link>
+              <Link href="/" className="text-white hover:text-brand-orange px-3 py-2 transition-colors font-medium">Home</Link>
+              <Link href="/#services" className="text-white hover:text-brand-orange px-3 py-2 transition-colors font-medium">Services</Link>
+              <Link href="/#about" className="text-white hover:text-brand-orange px-3 py-2 transition-colors font-medium">About</Link>
+              <Link href="/contact" className="bg-brand-orange hover:bg-orange-600 text-white px-6 py-2 rounded-full transition-colors font-bold">Get Started</Link>
             </div>
           </div>
         </div>

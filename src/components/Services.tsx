@@ -1,29 +1,30 @@
-import { Monitor, Smartphone, Search, Rocket, Code2, Globe, Cpu, Zap } from 'lucide-react';
+import { Monitor, Smartphone, Search, Rocket, Code2, Globe, Cpu, Zap, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 const services = [
   {
-    title: "Web Development",
-    description: "Lightning-fast websites built with Next.js 14 and modern architectures for optimal user experience.",
+    title: "Web Design",
+    slug: "web-design",
+    description: "Lightning-fast, mobile-responsive websites built with Next.js 14 for optimal performance and conversion.",
     icon: Globe,
-    color: "blue"
-  },
-  {
-    title: "App Solutions",
-    description: "Custom web applications and enterprise software tailored to automate and grow your business.",
-    icon: Cpu,
-    color: "orange"
   },
   {
     title: "SEO Strategy",
-    description: "Dominating search rankings with data-backed SEO that puts your business in front of the right audience.",
+    slug: "seo",
+    description: "Data-driven SEO solutions to help Christchurch businesses dominate search rankings and attract more leads.",
     icon: Search,
-    color: "blue"
   },
   {
-    title: "Digital Growth",
-    description: "Full-stack marketing and lead generation strategies designed to maximize your ROI and scaling.",
+    title: "Software Solutions",
+    slug: "software-solutions",
+    description: "Custom web applications and enterprise software tailored to automate and streamline your business operations.",
+    icon: Cpu,
+  },
+  {
+    title: "Ongoing Support",
+    slug: "support",
+    description: "Dedicated maintenance and technical support to keep your digital assets running smoothly 24/7.",
     icon: Rocket,
-    color: "orange"
   }
 ];
 
@@ -46,12 +47,19 @@ const Services = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {services.map((service, index) => (
-            <div key={index} className="group p-10 rounded-[2rem] bg-white/5 border border-white/10 hover:bg-white/[0.08] transition-all duration-500 flex flex-col justify-between min-h-[320px]">
+            <Link
+              href={`/services/${service.slug}`}
+              key={index}
+              className="group p-10 rounded-[2rem] bg-white/5 border border-white/10 hover:bg-white/[0.08] transition-all duration-500 flex flex-col justify-between min-h-[320px] cursor-pointer"
+            >
               <div>
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 bg-black/40 border border-white/10 group-hover:border-brand-orange/50 transition-colors">
                   <service.icon className="text-white group-hover:text-brand-orange transition-colors" size={32} />
                 </div>
-                <h3 className="text-3xl font-bold text-white mb-4 tracking-tight">{service.title}</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-3xl font-bold text-white mb-4 tracking-tight">{service.title}</h3>
+                  <ArrowRight className="text-brand-orange opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" size={24} />
+                </div>
                 <p className="text-gray-400 text-lg leading-relaxed">
                   {service.description}
                 </p>
@@ -59,7 +67,7 @@ const Services = () => {
               <div className="mt-8">
                 <div className="h-1 w-12 bg-brand-orange/30 group-hover:w-full transition-all duration-700"></div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
