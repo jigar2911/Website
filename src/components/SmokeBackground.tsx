@@ -556,13 +556,6 @@ const SmokeBackground = () => {
                 gl.clear(gl.COLOR_BUFFER_BIT);
             }
 
-            // Automatic splats to keep effect alive
-            if (now - lastSplatTime > 3000) {
-                const color = getNextColor();
-                splat(Math.random(), Math.random(), (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100, color);
-                lastSplatTime = now;
-            }
-
             // Continuous emission if holding
             if (isPressed && hasMoved) {
                 splat(
@@ -629,29 +622,31 @@ const SmokeBackground = () => {
                 return;
             }
 
-            let dx = (x - lastMouseX) * 10.0;
-            let dy = (y - lastMouseY) * 10.0;
+            // ONLY generate smoke if the mouse is pressed
+            if (isPressed) {
+                let dx = (x - lastMouseX) * 10.0;
+                let dy = (y - lastMouseY) * 10.0;
 
-            // Increase intensity if pressed
-            const forceMultiplier = isPressed ? 2.5 : 1.0;
-            const radiusMultiplier = isPressed ? 1.5 : 1.0;
+                const forceMultiplier = 2.5;
+                const radiusMultiplier = 1.5;
 
-            // Generate multiple splats if moving fast to ensure a solid trail
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            const steps = Math.min(Math.max(Math.floor(dist / 20), 1), 10);
+                // Generate multiple splats if moving fast to ensure a solid trail
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                const steps = Math.min(Math.max(Math.floor(dist / 20), 1), 10);
 
-            for(let i=0; i<steps; i++) {
-                const lerp = i / steps;
-                const currX = lastMouseX + (x - lastMouseX) * lerp;
-                const currY = lastMouseY + (y - lastMouseY) * lerp;
-                splat(
-                    currX / canvas!.width,
-                    1.0 - currY / canvas!.height,
-                    (dx / steps) * forceMultiplier,
-                    (-dy / steps) * forceMultiplier,
-                    getNextColor(),
-                    (config.SPLAT_RADIUS * radiusMultiplier) / 100.0
-                );
+                for(let i=0; i<steps; i++) {
+                    const lerp = i / steps;
+                    const currX = lastMouseX + (x - lastMouseX) * lerp;
+                    const currY = lastMouseY + (y - lastMouseY) * lerp;
+                    splat(
+                        currX / canvas!.width,
+                        1.0 - currY / canvas!.height,
+                        (dx / steps) * forceMultiplier,
+                        (-dy / steps) * forceMultiplier,
+                        getNextColor(),
+                        (config.SPLAT_RADIUS * radiusMultiplier) / 100.0
+                    );
+                }
             }
 
             lastMouseX = x;
