@@ -451,13 +451,13 @@ const SmokeBackground = () => {
 
         initFramebuffers();
 
-        function splat(x: number, y: number, dx: number, dy: number, color: { r: number, g: number, b: number }) {
+        function splat(x: number, y: number, dx: number, dy: number, color: { r: number, g: number, b: number }, radius?: number) {
             splatProgram.bind();
             gl.uniform1i(splatProgram.uniforms.uTarget, velocity.read.attach(0));
             gl.uniform1f(splatProgram.uniforms.aspectRatio, canvas!.width / canvas!.height);
             gl.uniform2f(splatProgram.uniforms.point, x, y);
             gl.uniform3f(splatProgram.uniforms.color, dx, dy, 0.0);
-            gl.uniform1f(splatProgram.uniforms.radius, config.SPLAT_RADIUS / 100.0);
+            gl.uniform1f(splatProgram.uniforms.radius, radius || config.SPLAT_RADIUS / 100.0);
             blit(velocity.write);
             velocity.swap();
 
@@ -563,6 +563,18 @@ const SmokeBackground = () => {
                 lastSplatTime = now;
             }
 
+            // Continuous emission if holding
+            if (isPressed && hasMoved) {
+                splat(
+                    lastMouseX / canvas!.width,
+                    1.0 - lastMouseY / canvas!.height,
+                    (Math.random() - 0.5) * 200,
+                    (Math.random() - 0.5) * 200,
+                    getNextColor(),
+                    config.SPLAT_RADIUS / 100.0
+                );
+            }
+
             step(dt);
 
             displayProgram.bind();
@@ -579,6 +591,7 @@ const SmokeBackground = () => {
         let lastMouseY = 0;
         let colorHue = Math.random();
         let hasMoved = false;
+        let isPressed = false;
 
         function getNextColor() {
             colorHue += 0.005; // Smooth transition through spectrum
@@ -619,6 +632,10 @@ const SmokeBackground = () => {
             let dx = (x - lastMouseX) * 10.0;
             let dy = (y - lastMouseY) * 10.0;
 
+            // Increase intensity if pressed
+            const forceMultiplier = isPressed ? 2.5 : 1.0;
+            const radiusMultiplier = isPressed ? 1.5 : 1.0;
+
             // Generate multiple splats if moving fast to ensure a solid trail
             const dist = Math.sqrt(dx*dx + dy*dy);
             const steps = Math.min(Math.max(Math.floor(dist / 20), 1), 10);
@@ -627,28 +644,54 @@ const SmokeBackground = () => {
                 const lerp = i / steps;
                 const currX = lastMouseX + (x - lastMouseX) * lerp;
                 const currY = lastMouseY + (y - lastMouseY) * lerp;
-                splat(currX / canvas!.width, 1.0 - currY / canvas!.height, dx / steps, -dy / steps, getNextColor());
+                splat(
+                    currX / canvas!.width,
+                    1.0 - currY / canvas!.height,
+                    (dx / steps) * forceMultiplier,
+                    (-dy / steps) * forceMultiplier,
+                    getNextColor(),
+                    (config.SPLAT_RADIUS * radiusMultiplier) / 100.0
+                );
             }
 
             lastMouseX = x;
             lastMouseY = y;
         };
 
-        const handleClick = (e: any) => {
+        const handleMouseDown = (e: any) => {
+            isPressed = true;
             const rect = canvas!.getBoundingClientRect();
             let x = (e.clientX || (e.touches && (e.touches[0].clientX || e.touches[0].pageX))) - rect.left;
             let y = (e.clientY || (e.touches && (e.touches[0].clientY || e.touches[0].pageY))) - rect.top;
 
+            lastMouseX = x;
+            lastMouseY = y;
+            hasMoved = true;
+
             // Big burst on click
-            for(let i=0; i<8; i++) {
-                splat(x / canvas!.width, 1.0 - y / canvas!.height, (Math.random() - 0.5) * 2000, (Math.random() - 0.5) * 2000, getNextColor());
+            for(let i=0; i<12; i++) {
+                splat(
+                    x / canvas!.width,
+                    1.0 - y / canvas!.height,
+                    (Math.random() - 0.5) * 4000,
+                    (Math.random() - 0.5) * 4000,
+                    getNextColor(),
+                    (config.SPLAT_RADIUS * 2.0) / 100.0
+                );
             }
+        };
+
+        const handleMouseUp = () => {
+            isPressed = false;
         };
 
         window.addEventListener('mousemove', handleMove);
         window.addEventListener('touchmove', handleMove);
-        window.addEventListener('mousedown', handleClick);
-        window.addEventListener('touchstart', handleClick);
+        window.addEventListener('mousedown', handleMouseDown);
+        window.addEventListener('touchstart', handleMouseDown);
+        window.addEventListener('mouseup', handleMouseUp);
+        window.addEventListener('touchend', handleMouseUp);
+        window.addEventListener('mouseleave', handleMouseUp);
 
         const handleResize = () => {
             canvas!.width = window.innerWidth;
@@ -662,8 +705,11 @@ const SmokeBackground = () => {
             cancelAnimationFrame(animationFrameId);
             window.removeEventListener('mousemove', handleMove);
             window.removeEventListener('touchmove', handleMove);
-            window.removeEventListener('mousedown', handleClick);
-            window.removeEventListener('touchstart', handleClick);
+            window.removeEventListener('mousedown', handleMouseDown);
+            window.removeEventListener('touchstart', handleMouseDown);
+            window.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener('touchend', handleMouseUp);
+            window.removeEventListener('mouseleave', handleMouseUp);
             window.removeEventListener('resize', handleResize);
         };
     }, []);
