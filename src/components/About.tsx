@@ -6,7 +6,7 @@ const About = () => {
           <div className="relative">
             <div className="aspect-square rounded-[3rem] bg-gradient-to-br from-brand-blue to-brand-orange opacity-20 absolute -inset-4 blur-2xl"></div>
             <div className="relative aspect-square rounded-[3rem] bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
-                <img src="/photo2.png" alt="Oncall Websites NZ" className="w-full h-full object-cover" />
+                <img src="/assets/pic1.png" alt="Oncall Websites NZ" className="w-full h-full object-cover" />
             </div>
           </div>
 

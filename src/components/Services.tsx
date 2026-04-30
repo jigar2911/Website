@@ -7,24 +7,28 @@ const services = [
     slug: "web-design",
     description: "Lightning-fast, mobile-responsive websites built with Next.js 14 for optimal performance and conversion.",
     icon: Globe,
+    image: "/assets/services1.png"
   },
   {
     title: "SEO Strategy",
     slug: "seo",
     description: "Data-driven SEO solutions to help Christchurch businesses dominate search rankings and attract more leads.",
     icon: Search,
+    image: "/assets/digital marketing.png"
   },
   {
     title: "Software Solutions",
     slug: "software-solutions",
     description: "Custom web applications and enterprise software tailored to automate and streamline your business operations.",
     icon: Cpu,
+    image: "/assets/services 2.png"
   },
   {
     title: "Ongoing Support",
     slug: "support",
     description: "Dedicated maintenance and technical support to keep your digital assets running smoothly 24/7.",
     icon: Rocket,
+    image: "/assets/pic 3.png"
   }
 ];
 
@@ -60,9 +64,14 @@ const Services = () => {
                   <h3 className="text-3xl font-bold text-white mb-4 tracking-tight">{service.title}</h3>
                   <ArrowRight className="text-brand-orange opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" size={24} />
                 </div>
-                <p className="text-gray-400 text-lg leading-relaxed">
+                <p className="text-gray-400 text-lg leading-relaxed mb-6">
                   {service.description}
                 </p>
+                {service.image && (
+                  <div className="mt-4 rounded-xl overflow-hidden border border-white/10 group-hover:border-brand-orange/30 transition-colors h-48 relative">
+                    <img src={service.image} alt={service.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                  </div>
+                )}
               </div>
               <div className="mt-8">
                 <div className="h-1 w-12 bg-brand-orange/30 group-hover:w-full transition-all duration-700"></div>

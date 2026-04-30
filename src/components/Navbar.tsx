@@ -7,7 +7,7 @@ const Navbar = () => {
         <div className="flex justify-between h-16 items-center">
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="flex items-center gap-2">
-              <img src="/logo.png" alt="Oncall Websites Logo" className="h-10 w-auto" />
+              <img src="/assets/oncall logo.png" alt="Oncall Websites Logo" className="h-12 w-auto" />
               <span className="text-2xl font-bold text-white tracking-tighter hidden sm:block">
                 ONCALL<span className="text-brand-orange">WEBSITES</span>
               </span>
